@@ -1,0 +1,45 @@
+[gd_scene load_steps=4 format=3 uid="uid://cn8ufis4t6nk4"]
+
+[ext_resource type="Script" path="res://scripts/world.gd" id="1_7ghob"]
+[ext_resource type="PackedScene" uid="uid://6uwhbcswn6ci" path="res://scenes/player.tscn" id="1_cemwd"]
+[ext_resource type="PackedScene" uid="uid://ofi7lyjwaii" path="res://scenes/npc.tscn" id="2_yn4aa"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_7ghob")
+
+[node name="Player" parent="." instance=ExtResource("1_cemwd")]
+position = Vector2(193, 293)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+zoom = Vector2(0.45, 0.45)
+
+[node name="NPCs" type="Node2D" parent="."]
+
+[node name="NPC" parent="NPCs" instance=ExtResource("2_yn4aa")]
+position = Vector2(1478, 304)
+
+[node name="NPCBot" parent="NPCs/NPC" index="0" node_paths=PackedStringArray("player")]
+player = NodePath("../../../Player")
+
+[node name="Sprite2D" parent="NPCs/NPC" index="1"]
+modulate = Color(0.63596, 0.644159, 0.171948, 1)
+
+[node name="NPC2" parent="NPCs" instance=ExtResource("2_yn4aa")]
+position = Vector2(1502, -472)
+
+[node name="NPCBot" parent="NPCs/NPC2" index="0" node_paths=PackedStringArray("player")]
+player = NodePath("../../../Player")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+offset_left = 21.0
+offset_top = 24.0
+offset_right = 89.0
+offset_bottom = 55.0
+text = "Train AI"
+
+[connection signal="button_up" from="CanvasLayer/Button" to="." method="_on_button_button_up"]
+
+[editable path="NPCs/NPC"]
+[editable path="NPCs/NPC2"]
