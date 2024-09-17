@@ -44,7 +44,7 @@ func init():
 	
 	
 func create_nn():
-	####Inputs 12
+	####Inputs 13
 	## current_action 5 inputs -> 0 - 1.0 each
 	## player_visible 	0 - 1		-> 0 - 1.0
 	## health 			0 - 100 	-> 0 - 1.0
@@ -57,7 +57,7 @@ func create_nn():
 	
 	####Outputs 5 - number of actions
 	
-	# 7 Inputs, 30 neurons on hidden layer, 5 Outputs
+	# 13 Inputs, 30 neurons on hidden layer, 5 Outputs
 	model_action_selection = NeuralNetwork.new(13, 30, 5)
 
 func load_tranning_data():
