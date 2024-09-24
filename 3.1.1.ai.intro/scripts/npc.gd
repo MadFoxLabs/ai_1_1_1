@@ -52,17 +52,15 @@ func _physics_process(delta):
 	if health <= 0:
 		get_parent().remove_child(self)
 		queue_free()
+	elif health <= 25:
+		select_new_action()
 	
 	if health < 80 and ready_to_heal:
 		health += delta
 	
 	if health < 30 and not stress_change_action:
 		stress_change_action = true
-		var next_action = action_selection_component.get_next_action(
-		finite_state_machine.current_state.state_id, true, 0.6)
-		finite_state_machine.set_state(next_action)
-	
-		t_change_action.start(randi_range(7, 14))
+		select_new_action()
 		
 
 func suffer_attack(damage):
@@ -76,13 +74,14 @@ func attack_player():
 	is_ready_to_attack = false
 	t_attack.start(0.7)
 	
-
-func _on_t_change_action_timeout() -> void:
+func select_new_action() -> void:
 	var next_action = action_selection_component.get_next_action(
 		finite_state_machine.current_state.state_id, true, 0.6)
 	finite_state_machine.set_state(next_action)
 	
 	t_change_action.start(randi_range(7, 14))
+func _on_t_change_action_timeout() -> void:
+	select_new_action()
 	
 func _on_state_result_changed(state_result):
 	if state_result == FiniteStateMachine.state_result_type.started:
