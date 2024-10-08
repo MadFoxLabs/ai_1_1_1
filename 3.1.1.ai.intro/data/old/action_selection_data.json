@@ -11,11 +11,9 @@
 				 "my_attack",
 				 "player_defense",
 				 "player_attack",
-			],
-			"inputs_arch":[5,1,1,1,1,1,1,1,1],
+			], 
 			"outputs":
-				["WANDERING", "ATTACK_PLAYER", "FIND_FRIENDS", "RUNAWAY_PLAYER", "GO_HOME"],
-			"outputs_arch":[5],
+				["WANDERING", "ATTACK_PLAYER", "FIND_FRIENDS", "RUNAWAY_PLAYER", "GO_HOME"]
 		},
 		
 	"data":
