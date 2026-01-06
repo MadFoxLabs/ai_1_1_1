@@ -24,7 +24,7 @@ func action_state():
 	
 	steps += 1
 	if steps > max_steps:
-		print()
+		#print()
 		steps = 0
 		
 		current_direction = current_direction.rotated(3*PI/4 + deg_to_rad(randi_range(-5,5)))

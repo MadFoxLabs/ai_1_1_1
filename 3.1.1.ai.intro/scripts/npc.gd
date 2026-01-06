@@ -5,7 +5,7 @@ var brake_mod = 0.08
 
 var health = 100
 var defense = 1.0
-var melee_attack = 20
+var melee_attack = 5
 
 var ready_to_heal = false
 
