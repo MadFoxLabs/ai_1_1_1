@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://ofi7lyjwaii"]
+[gd_scene load_steps=19 format=3 uid="uid://ofi7lyjwaii"]
 
 [ext_resource type="Texture2D" uid="uid://cj2wufa08wnu6" path="res://icon.svg" id="1_id0xq"]
 [ext_resource type="Script" uid="uid://bn67pkxawp346" path="res://scripts/npc.gd" id="1_m3sie"]
@@ -39,6 +39,9 @@ width = 128
 height = 12
 fill_from = Vector2(0.140777, 0.519417)
 fill_to = Vector2(0.699029, 0.36246)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v4e37"]
+size = Vector2(128, 128)
 
 [node name="NPC" type="CharacterBody2D" groups=["NPC"]]
 script = ExtResource("1_m3sie")
@@ -114,6 +117,11 @@ offset_bottom = -66.0
 texture_under = SubResource("GradientTexture2D_1lhh7")
 texture_progress = SubResource("GradientTexture2D_itvyh")
 
+[node name="Hitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_v4e37")
+
 [connection signal="body_entered" from="MyVision" to="." method="_on_my_vision_body_entered"]
 [connection signal="body_exited" from="MyVision" to="." method="_on_my_vision_body_exited"]
 [connection signal="body_entered" from="MyAttack" to="." method="_on_my_attack_body_entered"]
@@ -121,3 +129,4 @@ texture_progress = SubResource("GradientTexture2D_itvyh")
 [connection signal="timeout" from="TChangeAction" to="." method="_on_t_change_action_timeout"]
 [connection signal="timeout" from="TAttack" to="." method="_on_t_attack_timeout"]
 [connection signal="timeout" from="THealReady" to="." method="_on_t_heal_ready_timeout"]
+[connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]

@@ -129,3 +129,10 @@ func _on_t_heal_ready_timeout() -> void:
 	
 func train():
 	action_selection_component.train()
+
+
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	if area.is_in_group("range_attack"):
+		health -= area.base_damage
+		area.stop_arrow()
+		

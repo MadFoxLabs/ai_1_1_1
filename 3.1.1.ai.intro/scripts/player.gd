@@ -9,6 +9,8 @@ var health = 100
 var defense = 1.0
 var melee_attack = 15
 
+var aim_target = Vector2()
+
 @onready var texture_progress_bar: TextureProgressBar = $TextureProgressBar
 @onready var my_attack: Area2D = $MyAttack
 @onready var t_attack_ready: Timer = $TAttackReady
@@ -19,6 +21,9 @@ var melee_attack = 15
 
 var ready_to_attack = true
 var ready_to_heal = false
+
+const ARROW = preload("res://scenes/arrow.tscn")
+@export var ranged: Node2D = null
 
 func _ready() -> void:
 	health = 100
@@ -41,6 +46,15 @@ func _physics_process(delta: float) -> void:
 	elif direction.x > 0:
 		sprite_2d.scale.x = 2.5
 		skeleton_2d.scale.x = 1
+		
+	if Input.is_action_just_pressed("ui_aim"):
+		aim_target = get_global_mouse_position()
+	if Input.is_action_just_released("ui_aim"):
+		var new_arrow = ARROW.instantiate()
+		new_arrow.position = self.position
+		new_arrow.speed_direction = (aim_target - self.global_position).normalized()
+		ranged.add_child(new_arrow)
+		
 	move_and_slide()
 	if health < 80 and ready_to_heal:
 		health += delta
