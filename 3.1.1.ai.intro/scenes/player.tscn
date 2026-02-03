@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://6uwhbcswn6ci"]
+[gd_scene load_steps=18 format=3 uid="uid://6uwhbcswn6ci"]
 
 [ext_resource type="Script" uid="uid://dih45k1bshv8l" path="res://scripts/player.gd" id="1_uejaj"]
 [ext_resource type="Texture2D" uid="uid://chuql1gt2ywmc" path="res://assets/characterWalkingStatic.png" id="2_g2els"]
+[ext_resource type="Texture2D" uid="uid://p11cbspxcg75" path="res://assets/compositeBow.png" id="3_dqkch"]
 [ext_resource type="Texture2D" uid="uid://dfspqd8jer782" path="res://assets/sword.png" id="3_qhqgy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jopgl"]
@@ -26,6 +27,30 @@ width = 128
 height = 12
 fill_from = Vector2(0.140777, 0.519417)
 fill_to = Vector2(0.699029, 0.36246)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qlg0r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_dqkch")
+}],
+"loop": true,
+"name": &"Bow",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_qhqgy")
+}],
+"loop": true,
+"name": &"Sword",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qhqgy"]
 size = Vector2(50, 10)
@@ -209,12 +234,44 @@ tracks/3/keys = {
 "values": [0.0]
 }
 
+[sub_resource type="Animation" id="Animation_tuyoq"]
+resource_name = "Bow"
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Bone2D/Attack:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(46, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Bone2D/Attack:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-1.5874839]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_qlg0r"]
 _data = {
 &"Attack": SubResource("Animation_qhqgy"),
+&"Bow": SubResource("Animation_tuyoq"),
 &"RESET": SubResource("Animation_dqkch"),
 &"idle": SubResource("Animation_qlg0r")
 }
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dqkch"]
+radius = 65.03076
 
 [node name="Player" type="CharacterBody2D" groups=["Player"]]
 script = ExtResource("1_uejaj")
@@ -257,11 +314,12 @@ auto_calculate_length_and_angle = false
 length = 48.0
 bone_angle = 0.0
 
-[node name="Sprite2D" type="Sprite2D" parent="Skeleton2D/Bone2D/Attack"]
+[node name="WeaponSprite" type="AnimatedSprite2D" parent="Skeleton2D/Bone2D/Attack"]
 texture_filter = 1
 position = Vector2(28, 1)
 rotation = 1.5707964
-texture = ExtResource("3_qhqgy")
+sprite_frames = SubResource("SpriteFrames_qlg0r")
+animation = &"Sword"
 
 [node name="MyAttack" type="Area2D" parent="Skeleton2D/Bone2D/Attack"]
 position = Vector2(-55.000008, -11.000001)
@@ -277,6 +335,13 @@ libraries = {
 &"": SubResource("AnimationLibrary_qlg0r")
 }
 
+[node name="PickupArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
+position = Vector2(0, 34)
+shape = SubResource("CircleShape2D_dqkch")
+
 [connection signal="timeout" from="TAttackReady" to="." method="_on_t_attack_ready_timeout"]
 [connection signal="timeout" from="THealReady" to="." method="_on_t_heal_ready_timeout"]
 [connection signal="body_entered" from="Skeleton2D/Bone2D/Attack/MyAttack" to="." method="_on_my_attack_body_entered"]
+[connection signal="area_entered" from="PickupArea" to="." method="_on_pickup_area_area_entered"]

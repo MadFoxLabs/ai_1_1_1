@@ -6,7 +6,7 @@ extends Node
 var model_action_selection: NeuralNetwork
 const EPOCHS = 400
 
-
+@export var trainning_file_name = "res://data/action_selection_data.json"
 
 @export var verbose_level = 0
 
@@ -44,24 +44,19 @@ func init():
 	
 	
 func create_nn():
-	####Inputs 13
-	## current_action 5 inputs -> 0 - 1.0 each
+	####Inputs 4
 	## player_visible 	0 - 1		-> 0 - 1.0
 	## health 			0 - 100 	-> 0 - 1.0
 	## player_health  	0 - 100 	-> 0 - 1.0
 	## friends_nearby 	0 - 10  	-> 0 - 1.0
-	## my_defense		1.0 - 2.0  	-> 0 - 1.0
-	## my_attack		0 - 100  	-> 0 - 1.0
-	## player_defense	1.0 - 2.0  	-> 0 - 1.0
-	## player_attack	0 - 100  	-> 0 - 1.0
 	
 	####Outputs 5 - number of actions
 	
 	# 13 Inputs, 30 neurons on hidden layer, 5 Outputs
-	model_action_selection = NeuralNetwork.new(13, 30, 5)
+	model_action_selection = NeuralNetwork.new(4, 30, 5)
 
 func load_tranning_data():
-	var file = "res://data/action_selection_data.json"
+	var file = trainning_file_name
 	var json_as_text = FileAccess.get_file_as_string(file)
 	var json_as_dict = JSON.parse_string(json_as_text)
 	if json_as_dict:
@@ -81,11 +76,11 @@ func get_next_action(current_action=null, current_success=false, temperature=0):
 	var vector = []
 	
 	## current_action 5 inputs -> 0 - 1.0 each
-	vector = get_action_input(current_action)
+	#vector = get_action_input(current_action)
 	if verbose_level > 2:
 		print("current action: {vector}".format({"vector": vector}))
-	for i in vector:
-		current_input.append(i)
+	#for i in vector:
+		#current_input.append(i)
 	
 	## player_visible 	0 - 1		-> 0 - 1.0
 	current_input.append(1 if get_parent().player_is_in_visible else 0)
@@ -102,20 +97,20 @@ func get_next_action(current_action=null, current_success=false, temperature=0):
 	current_input.append(0)
 	
 	## my_defense		1.0 <-> 2.0  	-> 0 <-> 1.0
-	current_input.append(mapping_value_linear(actor.defense, 
-	0, 2.0, 0, 1))
-	
-	## my_attack		0 <-> 100  		-> 0 <-> 1.0
-	current_input.append(mapping_value_linear(actor.melee_attack, 
-	0, 100, 0, 1))
-	
-	## player_defense	1.0 <-> 2.0  	-> 0 <-> 1.0
-	current_input.append(mapping_value_linear(get_parent().get_player_defense(), 
-	0, 2.0, 0, 1))
-	
-	## player_attack	0 <-> 100  		-> 0 <-> 1.0
-	current_input.append(mapping_value_linear(get_parent().get_player_attack(), 
-	0, 100, 0, 1))
+	#current_input.append(mapping_value_linear(actor.defense, 
+	#0, 2.0, 0, 1))
+	#
+	### my_attack		0 <-> 100  		-> 0 <-> 1.0
+	#current_input.append(mapping_value_linear(actor.melee_attack, 
+	#0, 100, 0, 1))
+	#
+	### player_defense	1.0 <-> 2.0  	-> 0 <-> 1.0
+	#current_input.append(mapping_value_linear(get_parent().get_player_defense(), 
+	#0, 2.0, 0, 1))
+	#
+	### player_attack	0 <-> 100  		-> 0 <-> 1.0
+	#current_input.append(mapping_value_linear(get_parent().get_player_attack(), 
+	#0, 100, 0, 1))
 	
 	var result = model_action_selection.predict(current_input)
 	if verbose_level > 2:

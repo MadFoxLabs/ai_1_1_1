@@ -32,6 +32,8 @@ var is_attacking = false
 var is_ready_to_attack = true
 var stress_change_action = false
 
+
+
 func _ready():
 	health = 100
 	npc_bot.init()

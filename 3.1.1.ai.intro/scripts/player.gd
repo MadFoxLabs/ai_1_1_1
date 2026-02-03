@@ -18,16 +18,25 @@ var aim_target = Vector2()
 @onready var animation_player: AnimationPlayer = $Skeleton2D/AnimationPlayer
 @onready var skeleton_2d: Skeleton2D = $Skeleton2D
 @onready var sprite_2d: Sprite2D = $Sprite2D
+@onready var weapon_sprite: AnimatedSprite2D = $Skeleton2D/Bone2D/Attack/WeaponSprite
+
 
 var ready_to_attack = true
 var ready_to_heal = false
 
+var selected_weapon = 1
+
 const ARROW = preload("res://scenes/arrow.tscn")
 @export var ranged: Node2D = null
+var number_arrows = 7
+
+@export var hud_n_arrows: Label = null
 
 func _ready() -> void:
 	health = 100
+	weapon_sprite.play("Sword")
 	animation_player.play("idle")
+	
 
 func _physics_process(delta: float) -> void:
 	texture_progress_bar.value = health
@@ -47,24 +56,42 @@ func _physics_process(delta: float) -> void:
 		sprite_2d.scale.x = 2.5
 		skeleton_2d.scale.x = 1
 		
-	if Input.is_action_just_pressed("ui_aim"):
+	if Input.is_action_just_pressed("ui_aim") and number_arrows > 0 and selected_weapon == 2:
 		aim_target = get_global_mouse_position()
-	if Input.is_action_just_released("ui_aim"):
+	if Input.is_action_just_released("ui_aim") and number_arrows > 0 and selected_weapon == 2:
 		var new_arrow = ARROW.instantiate()
 		new_arrow.position = self.position
 		new_arrow.speed_direction = (aim_target - self.global_position).normalized()
 		ranged.add_child(new_arrow)
+		number_arrows -= 1
 		
 	move_and_slide()
 	if health < 80 and ready_to_heal:
 		health += delta
-	if Input.is_action_just_pressed("ui_accept") and ready_to_attack:
+	if Input.is_action_just_pressed("ui_accept") and ready_to_attack and selected_weapon == 1:
 		attack_enemies()
 		ready_to_attack = false
 		t_attack_ready.start(0.7)
 	
+	if Input.is_action_just_released("ui_select_1"):
+		selected_weapon = 1
+		weapon_sprite.play("Sword")
+		#weapon_sprite.stop()
+		#animation_player.play("Attack")
+		#animation_player.stop
+	if Input.is_action_just_released("ui_select_2"):
+		selected_weapon = 2
+		animation_player.play("Bow")
+		animation_player.stop
 		
-		
+		weapon_sprite.play("Bow")
+		weapon_sprite.stop()
+	update_n_arrows()
+	
+func update_n_arrows():
+	if hud_n_arrows != null:
+		hud_n_arrows.text = str(number_arrows)
+
 func suffer_attack(damage):
 	health -= damage * (1/defense)
 	t_heal_ready.start(10)
@@ -93,3 +120,9 @@ func _on_t_heal_ready_timeout() -> void:
 func _on_my_attack_body_entered(body: Node2D) -> void:
 	if body.is_in_group("NPC"):
 		body.suffer_attack(melee_attack)
+
+
+func _on_pickup_area_area_entered(area: Area2D) -> void:
+	if area.is_in_group("pickable"):
+		number_arrows += 1
+		area.queue_free()
