@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://6uwhbcswn6ci"]
+[gd_scene load_steps=20 format=3 uid="uid://6uwhbcswn6ci"]
 
 [ext_resource type="Script" uid="uid://dih45k1bshv8l" path="res://scripts/player.gd" id="1_uejaj"]
 [ext_resource type="Texture2D" uid="uid://chuql1gt2ywmc" path="res://assets/characterWalkingStatic.png" id="2_g2els"]
@@ -18,7 +18,6 @@ width = 128
 height = 12
 
 [sub_resource type="Gradient" id="Gradient_kao88"]
-offsets = PackedFloat32Array(0, 0.65493)
 colors = PackedColorArray(0.929412, 0.247059, 0, 1, 0.305882, 1, 0.564706, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_4nsqp"]
@@ -26,7 +25,15 @@ gradient = SubResource("Gradient_kao88")
 width = 128
 height = 12
 fill_from = Vector2(0.140777, 0.519417)
-fill_to = Vector2(0.699029, 0.36246)
+fill_to = Vector2(1, 0.2749141)
+
+[sub_resource type="Gradient" id="Gradient_dqkch"]
+colors = PackedColorArray(0.05057323, 6.430268e-05, 0.91555774, 1, 0.22745098, 0.43137255, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_qlg0r"]
+gradient = SubResource("Gradient_dqkch")
+width = 128
+height = 12
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_qlg0r"]
 animations = [{
@@ -285,13 +292,23 @@ texture = ExtResource("2_g2els")
 position = Vector2(3, 3.5)
 shape = SubResource("RectangleShape2D_jopgl")
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+[node name="HealthProgressBar" type="TextureProgressBar" parent="."]
 offset_left = -64.0
 offset_top = -93.0
 offset_right = 64.0
-offset_bottom = -29.0
+offset_bottom = -81.0
+value = 100.0
 texture_under = SubResource("GradientTexture2D_p6gti")
 texture_progress = SubResource("GradientTexture2D_4nsqp")
+
+[node name="StaminaProgressBar" type="TextureProgressBar" parent="."]
+offset_left = -64.0
+offset_top = -109.0
+offset_right = 64.0
+offset_bottom = -97.0
+value = 100.0
+texture_under = SubResource("GradientTexture2D_p6gti")
+texture_progress = SubResource("GradientTexture2D_qlg0r")
 
 [node name="TAttackReady" type="Timer" parent="."]
 wait_time = 0.7

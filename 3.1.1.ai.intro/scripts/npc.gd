@@ -10,8 +10,8 @@ var melee_attack = 5
 var ready_to_heal = false
 
 const WANDERING_SPEED := 200.0
-const ATTACK_SPEED := 250.0
-const RUNAWAY_SPEED := 300.0
+const ATTACK_SPEED := 400.0
+const RUNAWAY_SPEED := 450.0
 
 var moving_modifier:float = 1.0
 
@@ -135,6 +135,6 @@ func train():
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area.is_in_group("range_attack"):
-		health -= area.base_damage
+		health -= area.final_damage
 		area.stop_arrow()
 		
