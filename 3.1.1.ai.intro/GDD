@@ -1,0 +1,214 @@
+================================================================
+GAME DESIGN DOCUMENT
+Collaborative NPC Extension — Top-Down Shooter / Arena
+================================================================
+
+
+OVERVIEW
+--------
+Genre:          Top-down shooter / arena
+New feature:    Companion NPC (fight + guide)
+Build time:     1-2 sessions
+Scope strategy: Extend the existing project — do not rebuild
+
+Concept:
+The player now has a Companion NPC that travels alongside them.
+The companion has two roles:
+  - Guide: uses A* to lead the player toward a hidden objective
+  - Fighter: uses a Neural Network to decide when to fire arrows
+
+All NPCs (enemies and companion) gain the ability to fire arrows.
+Companion arrows help the player; enemy arrows punish the player
+for ignoring the companion's guidance.
+
+Teaching goals this links to:
+  - A* navigation
+  - Neural Networks
+  - Primary / Secondary control
+  - Composition in Godot
+  - Reinforcement Learning (optional stretch)
+
+
+================================================================
+COMPANION NPC — AI DESIGN
+================================================================
+
+STATE MACHINE (Primary control)
+--------------------------------
+States:
+  [Guide mode] --> (enemy nearby) --> [Combat mode]
+  [Combat mode] --> (enemy dead / far) --> [Guide mode]
+
+Guide mode:
+  - Companion stays 80-120px ahead of the player on the A* path
+  - Emits a visual signal (glow or arrow indicator) pointing
+    toward the objective
+  - Does not fire arrows in this state
+
+Combat mode:
+  - Companion stops moving
+  - Faces the nearest threatening enemy
+  - NN decides whether to fire an arrow
+
+
+NAVIGATION (A*)
+---------------
+  - Companion runs A* on the existing tilemap
+  - Recalculates path every 0.5s, or when the player moves
+    more than 2 tiles
+  - Picks a waypoint 2-3 tiles ahead of the player as its
+    follow target — so it always appears to be leading
+  - The objective tile is hidden from the player's minimap
+    but known to the companion's pathfinder
+  - This creates the "follow me" dynamic without a UI arrow
+
+
+NEURAL NETWORK — When to fire (Secondary control)
+--------------------------------------------------
+Inputs (5 neurons):
+  1. Distance to enemy       (normalised 0-1)
+  2. Enemy health            (normalised 0-1)
+  3. Player health           (normalised 0-1)
+  4. Companion health        (normalised 0-1)
+  5. Line of sight           (binary: 0 or 1)
+
+Hidden layer:
+  - 4-6 neurons
+  - Activation: ReLU
+
+Output (1 neuron):
+  - Fire probability
+  - Activation: Sigmoid (output range 0-1)
+  - Fire threshold: 0.65
+
+Teaching note:
+  Students can pre-train the NN with hand-labelled data
+  ("should the companion fire in this situation?") and observe
+  how changing the threshold changes behaviour. This directly
+  connects the backpropagation and training data lessons.
+
+
+================================================================
+ARROW SYSTEM — ALL NPCs
+================================================================
+
+SHARED ARROW SCENE (Godot Composition)
+---------------------------------------
+Scene structure:
+  Arrow.tscn
+    Area2D
+      Sprite2D
+      CollisionShape2D
+
+Behaviour:
+  - Moves in its facing direction at a fixed speed
+  - Deals damage on collision
+  - Calls queue_free() after 2 seconds or on first hit
+
+Both enemy NPCs and the companion instance this same scene via
+preload() + instantiate(). This is a direct application of the
+Composition in Godot lesson — one scene, many users.
+
+
+FIRING RULES PER ACTOR
+-----------------------
+Enemy NPCs:
+  - Fire on a simple cooldown timer
+  - No NN — keeps enemies simple and makes the companion's
+    AI feel smarter by comparison
+
+Companion NPC:
+  - Fires only when NN output >= 0.65
+  - AND line of sight to enemy is clear
+  - Never fires if the arrow path would cross the player
+
+
+FRIENDLY FIRE GUARD
+--------------------
+Use Godot collision layers:
+  Layer 1 — Player
+  Layer 2 — Companion arrows   (cannot damage player)
+  Layer 3 — Enemy arrows       (cannot damage companion)
+
+Arrow scenes check their owner's layer before dealing damage.
+Students implement this — good lesson in Godot physics layers.
+
+
+================================================================
+OBJECTIVE & WIN CONDITION
+================================================================
+
+THE OBJECTIVE
+-------------
+A hidden tile (chest, portal, or flag — student's choice) is
+placed in a corner of the arena. The player cannot see it on
+the map at the start. The companion knows where it is and its
+A* path leads there.
+
+The player must trust and follow the companion. Enemy NPCs
+spawn between the player and the objective, pressuring the
+player to let the companion fight while they move.
+
+
+WIN / LOSE CONDITIONS
+---------------------
+Win:      Player reaches the objective tile while the
+          companion is still alive.
+
+Lose (1): Player health reaches 0.
+
+Lose (2): Companion health reaches 0 — the player loses
+          their guide and cannot find the objective.
+
+Design note:
+  Losing the companion as a lose condition is the key design
+  choice. It forces the player to protect the AI, making the
+  collaboration feel meaningful and not just cosmetic.
+
+
+================================================================
+SESSION PLAN
+================================================================
+
+SESSION 1 — Companion skeleton + arrows
+-----------------------------------------
+1. Create Arrow.tscn (shared scene)
+   - Give it to enemy NPCs first so it works immediately
+2. Create Companion.tscn (CharacterBody2D + A* component)
+3. Wire companion to follow player using path waypoint logic
+4. Add Guide / Combat state switch based on enemy proximity
+5. Companion fires arrows in Combat mode (hardcoded threshold)
+
+End of session goal:
+  Arrows fly, companion follows, basic guide behaviour works.
+
+
+SESSION 2 — NN integration + polish
+--------------------------------------
+1. Replace hardcoded threshold with NN firing decision
+2. Students label 20-30 training scenarios (spreadsheet/JSON)
+3. Train NN, export weights, plug into companion
+4. Add companion health bar + lose condition
+5. Place hidden objective tile, test full win/lose loop
+6. Show to other students — collect feedback
+
+End of session goal:
+  Fully playable, shareable demo.
+
+
+STRETCH GOALS (if time allows)
+--------------------------------
+- Let the companion's NN weights improve via simple
+  reinforcement: reward if arrow hits, penalise if missed.
+  This is ~20 lines of code and directly previews next year's
+  deeper RL content.
+
+- Add a second companion with a different NN personality
+  (aggressive vs conservative threshold) and let the player
+  choose which to follow.
+
+
+
+================================================================
+END OF DOCUMENT
+================================================================

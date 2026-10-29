@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://d3bgj3s5hwsy"]
+[gd_resource type="TileSet" format=3 uid="uid://d3bgj3s5hwsy"]
 
 [ext_resource type="Texture2D" uid="uid://t6ccqw3muwkj" path="res://assets/tileset outdoor topdown3.png" id="1_v7xi7"]
 
